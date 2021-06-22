@@ -73,7 +73,8 @@ jobs:
     steps:
       - checkout
       # Restore from cache
-      # Your job code here
+      cd frontend
+      npm run test
                 
   test-backend:
     docker:
@@ -81,7 +82,8 @@ jobs:
     steps:
       - checkout
       # Restore from cache
-      # Your job code here
+      cd backend
+      npm run test
             
   scan-frontend:
     docker:
