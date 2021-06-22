@@ -101,7 +101,7 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli:latest
     steps:
       - checkout
       - run:
@@ -210,6 +210,7 @@ jobs:
   smoke-test:
     docker:
       - image: alpine:latest
+    steps:      
       - checkout
       - run:
           name: Install dependencies
