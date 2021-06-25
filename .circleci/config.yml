@@ -131,7 +131,7 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=udacity-thomas-forward-${CIRCLE_WORKFLOW_ID}
+              --tags project=udacity-thomas-forward-${CIRCLE_WORKFLOW_ID} \
               --stack-name udacity-backend-thomas-forward \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
               --region eu-central-1
