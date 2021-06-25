@@ -171,10 +171,12 @@ jobs:
             
             curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
             --request PUT --data "${BACKEND_IP}" https://api.memstash.io/values/backend_ip
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
+      
+      # IP is saved in memstash
+      #- persist_to_workspace:
+      #    root: ~/
+      #    paths:
+      #      - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
@@ -182,7 +184,9 @@ jobs:
       - image: cytopia/ansible:latest
     steps:
       - checkout
-      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints:
+            - "c3:3f:75:40:b2:41:b3:d3:eb:4b:73:a1:de:88:82:8c"
       # attach workspace
       - run:
           name: Install dependencies
@@ -324,9 +328,9 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-#          filters:
-#            branches:
-#              only: [test-feature-branch]
+          filters:
+            branches:
+              only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
