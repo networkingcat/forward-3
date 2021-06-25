@@ -131,8 +131,8 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=udacity-thomas-forward-${CIRCLE_WORKFLOW_ID} \
-              --stack-name udacity-backend-thomas-forward \
+              --tags project=udacity-backend-thomas-forward-${CIRCLE_WORKFLOW_ID} \
+              --stack-name udacity-backend-thomas-forward-${CIRCLE_WORKFLOW_ID} \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
               --region eu-central-1
 
@@ -141,10 +141,10 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              #--tags project=your-tag \
-              # --stack-name "your front-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
-              exit 1
+              --tags project=udacity-fronend-thomas-forward-${CIRCLE_WORKFLOW_ID} \
+              --stack-name udacity-frontend-thomas-forward-${CIRCLE_WORKFLOW_ID} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
+              --region eu-central-1
       - run:
           name: Add back-end ip to ansible inventory
           command: |
