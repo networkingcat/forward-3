@@ -134,7 +134,7 @@ jobs:
               --tags project=udacity-thomas-forward-${CIRCLE_WORKFLOW_ID}
               --stack-name udacity-backend-thomas-forward \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
-              -- region eu-central-1
+              --region eu-central-1
 
       - run:
           name: Ensure front-end infrastructure exist
