@@ -146,10 +146,31 @@ jobs:
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
               --region eu-central-1
       - run:
+          name: Add url to memststash
+          command: |
+            WEBSITEURL=$(aws cloudformation describe-stacks \
+              --region eu-central-1 \
+              --stack-name udacity-frontend-thomas-forward-${CIRCLE_WORKFLOW_ID} \
+              --query 'Stacks[0].Outputs[?'OutputKey'].OutputValue' \
+              --output text)
+              
+            echo ${WEBSITEURL}
+            
+            curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
+            --request PUT --data "${WEBSITEURL}" https://api.memstash.io/values/websiteurl             
+      - run:
           name: Add back-end ip to ansible inventory
           command: |
-            # Your code here
-            exit 1
+            BACKEND_IP=$(aws cloudformation describe-stacks \
+              --region eu-central-1 \
+              --stack-name udacity-backend-thomas-forward-${CIRCLE_WORKFLOW_ID} \
+              --query 'Stacks[0].Outputs[?'OutputKey'].OutputValue' \
+              --output text)
+              
+            echo ${BACKEND_IP}
+            
+            curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
+            --request PUT --data "${BACKEND_IP}" https://api.memstash.io/values/backend_ip
       - persist_to_workspace:
           root: ~/
           paths:
