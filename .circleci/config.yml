@@ -197,7 +197,7 @@ jobs:
       - run:
           name: Configure server
           command: |
-            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/websiteurl)
+            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/backend_ip)
             cd .circleci/ansible/
             echo ${BACKEND_IP} >> ./inventory.txt
             ansible-playbook -i ./inventory.txt configure-server.yml
