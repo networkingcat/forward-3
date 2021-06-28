@@ -191,13 +191,15 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # Your code here
-            exit 1
+            apt-get install -y curl ansible
       - run:
           name: Configure server
           command: |
-            # Your code here
-            exit 1
+            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/websiteurl)
+            cd .circleci/ansible/
+            echo ${BACKEND_IP} >> ./inventory.txt
+            ansible-playbook -i ./inventory.txt configure-server.yml
+            
       # Here's where you will add some code to rollback on failure      
 
   run-migrations:
