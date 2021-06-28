@@ -31,7 +31,7 @@
 #    src: /root/project/backend
 #    dest: /home/ubuntu
 
-- name: "sync files from CircleCI to Server
+- name: "sync files from CircleCI to Server"
   synchronize: 
     src: /root/project/backend
     dest: /home/ubuntu
