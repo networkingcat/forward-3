@@ -191,7 +191,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apt-get install -y curl ansible
+            apk add --no-cache curl
+            apk add --no-cache openssh-client
+            apk add --no-cache --update ansible
       - run:
           name: Configure server
           command: |
