@@ -193,6 +193,7 @@ jobs:
           command: |
             apk add --no-cache curl
             apk add --no-cache openssh-client
+            apk add --no-cache rsync
             apk add --no-cache --update ansible
       - run:
           name: Configure server
@@ -331,11 +332,11 @@ workflows:
       #    requires: [build-backend]
       #- scan-frontend:
       #    requires: [build-frontend]
-      - deploy-infrastructure:
+      #- deploy-infrastructure:
       #    requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [master]
+      #    filters:
+      #      branches:
+      #        only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
