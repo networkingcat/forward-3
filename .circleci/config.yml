@@ -217,7 +217,7 @@ jobs:
           name: Run migrations
                       #print env to debug connection error 
           command: |
-            echo printenv 
+            printenv
             printenv >> ./backend/.env
             cd backend
             npm run migrations > migration_status.txt
