@@ -214,8 +214,10 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            # Your code here
-            exit 1
+            printenv >> ./backend/.env
+            cd backend
+            npm run migrations > migration_status.txt
+            cat  migration_status.txt
       - run:
           name: Send migration results to memstash
           command: |
