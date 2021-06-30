@@ -219,6 +219,7 @@ jobs:
           command: |
             printenv
             printenv >> ./backend/.env
+            cat ./backend/.env
             cd backend
             npm run migrations > migration_status.txt
             cat  migration_status.txt
@@ -343,11 +344,11 @@ workflows:
       #    filters:
       #      branches:
       #        only: [master]
-      - configure-infrastructure
       #- configure-infrastructure:
       #    requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
+      - run-migrations
+      #- run-migrations:
+      #    requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:
