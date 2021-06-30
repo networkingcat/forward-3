@@ -215,7 +215,9 @@ jobs:
           keys: [backend-build]      
       - run:
           name: Run migrations
+                      #print env to debug connection error 
           command: |
+            echo printenv 
             printenv >> ./backend/.env
             cd backend
             npm run migrations > migration_status.txt
