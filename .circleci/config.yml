@@ -273,16 +273,26 @@ jobs:
       - image: cytopia/ansible:latest
     steps:
       - checkout
-      # Add ssh keys with fingerprint
-      # attach workspace
+      - add_ssh_keys:
+          fingerprints:
+            - "c3:3f:75:40:b2:41:b3:d3:eb:4b:73:a1:de:88:82:8c"
+      - restore_cache:
+          keys: [backend-build]      
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            apk add --no-cache curl
+            apk add --no-cache openssh-client
+            apk add --no-cache rsync
+            apk add --no-cache --update ansible
       - run:
-          name: Deploy backend
+          name: Configure server
           command: |
-            # your code here
+            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/backend_ip)
+            cd .circleci/ansible/
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            echo ${BACKEND_IP} >> ./inventory.txt
+            ansible-playbook -i ./inventory.txt cdeploy-backend.yml
       # Here's where you will add some code to rollback on failure  
 
   smoke-test:
