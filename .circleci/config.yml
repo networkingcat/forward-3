@@ -245,17 +245,24 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+            . ~/.nvm/nvm.sh
+            nvm install node 13.8.0
       - run:
           name: Get backend url
           command: |
-            # your code here
+            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/backend_ip)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
+            cd frontend
+            npm run build
+
       - run:
           name: Deploy frontend objects
           command: |
-            # your code here
+            cd frontend
+            aws s3 cp dist/ s3://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4 --recursive
+      #aws s3 cp dist/ s3://udapeople-"${CIRCLE_WORKFLOW_ID}"  --recursive
       # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
@@ -353,7 +360,6 @@ workflows:
       #        only: [master]
       #- configure-infrastructure:
       #    requires: [deploy-infrastructure]
-      - run-migrations
       #- run-migrations:
       #    requires: [configure-infrastructure]
       - deploy-frontend:
