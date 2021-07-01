@@ -253,7 +253,8 @@ jobs:
               --request PUT --data "0" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID}
               echo "There was no database migration"
             fi
-      - destroy-environment 
+      - destroy-environment
+      - revert-migrations      
 # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
@@ -286,7 +287,8 @@ jobs:
             cd frontend
             aws s3 cp dist/ s3://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4 --recursive
       #aws s3 cp dist/ s3://udapeople-"${CIRCLE_WORKFLOW_ID}"  --recursive
-      - destroy-environment 
+      - destroy-environment
+      - revert-migrations      
 # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
@@ -318,6 +320,7 @@ jobs:
             echo ${BACKEND_IP} >> ./inventory.txt
             ansible-playbook -i ./inventory.txt deploy-backend.yml
       - destroy-environment 
+      - revert-migrations      
 # Here's where you will add some code to rollback on failure  
 
   smoke-test:
@@ -331,7 +334,7 @@ jobs:
             apk add --no-cache curl
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
-            sudo ./aws/install            
+            ./aws/install            
       - run:
           name: Backend smoke test.
           command: |
@@ -355,6 +358,7 @@ jobs:
               return 1
             fi
       - destroy-environment 
+      - revert-migrations      
 # Here's where you will add some code to rollback on failure  
 
   cloudfront-update:
