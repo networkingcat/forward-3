@@ -10,8 +10,13 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            # Your code here
-            exit 1
+            # Delete files from bucket
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID}/ --recursive
+            # Delete front end stack
+            aws cloudformation delete-stack --stack-name udacity-frontend-thomas-forward-${CIRCLE_WORKFLOW_ID}
+            # Delete back end stack
+            aws cloudformation delete-stack --stack-name udacity-backend-thomas-forward-${CIRCLE_WORKFLOW_ID}
+
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -21,14 +26,17 @@ commands:
       - run:
           name: Revert migrations
           # Add when this will run
+          when: on_fail          
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS=$(curl -H "token:  ${CIRCLE_WORKFLOW_ID}" \
+              --request GET https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID}
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
+              cd ~/project/backend
+              npm install
+              npm migrations:revert
+
               exit 1
             fi
             
@@ -171,7 +179,8 @@ jobs:
             
             curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
             --request PUT --data "${BACKEND_IP}" https://api.memstash.io/values/backend_ip
-      
+   
+      - destroy-environment 
       # IP is saved in memstash
       #- persist_to_workspace:
       #    root: ~/
@@ -195,6 +204,9 @@ jobs:
             apk add --no-cache openssh-client
             apk add --no-cache rsync
             apk add --no-cache --update ansible
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install                
       - run:
           name: Configure server
           command: |
@@ -203,7 +215,7 @@ jobs:
             export ANSIBLE_HOST_KEY_CHECKING=False
             echo ${BACKEND_IP} >> ./inventory.txt
             ansible-playbook -i ./inventory.txt configure-server.yml
-            
+      - destroy-environment 
       # Here's where you will add some code to rollback on failure      
 
   run-migrations:
@@ -213,6 +225,12 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]      
+      - run:
+          name: Install dependencies
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install      
       - run:
           name: Run migrations
                       #print env to debug connection error 
@@ -235,7 +253,8 @@ jobs:
               --request PUT --data "0" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID}
               echo "There was no database migration"
             fi
-     # Here's where you will add some code to rollback on failure      
+      - destroy-environment 
+# Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
     docker:
@@ -267,7 +286,8 @@ jobs:
             cd frontend
             aws s3 cp dist/ s3://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4 --recursive
       #aws s3 cp dist/ s3://udapeople-"${CIRCLE_WORKFLOW_ID}"  --recursive
-      # Here's where you will add some code to rollback on failure      
+      - destroy-environment 
+# Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
     docker:
@@ -286,6 +306,9 @@ jobs:
             apk add --no-cache openssh-client
             apk add --no-cache rsync
             apk add --no-cache --update ansible
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install            
       - run:
           name: Configure server
           command: |
@@ -294,7 +317,8 @@ jobs:
             export ANSIBLE_HOST_KEY_CHECKING=False
             echo ${BACKEND_IP} >> ./inventory.txt
             ansible-playbook -i ./inventory.txt deploy-backend.yml
-      # Here's where you will add some code to rollback on failure  
+      - destroy-environment 
+# Here's where you will add some code to rollback on failure  
 
   smoke-test:
     docker:
@@ -305,6 +329,9 @@ jobs:
           name: Install dependencies
           command: |
             apk add --no-cache curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install            
       - run:
           name: Backend smoke test.
           command: |
@@ -327,7 +354,8 @@ jobs:
             else
               return 1
             fi
-      # Here's where you will add some code to rollback on failure  
+      - destroy-environment 
+# Here's where you will add some code to rollback on failure  
 
   cloudfront-update:
     docker:
@@ -337,7 +365,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - run:
           name: Update cloudfront distribution
           command: |
