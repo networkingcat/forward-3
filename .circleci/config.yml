@@ -353,7 +353,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            if curl -s "http://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4.s3-website.eu-central-1.amazonaws.com/" | grep -o "Welcome"
+            if curl -s "http://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4.s3-website.eu-central-1.amazonaws.com/fail" | grep -o "Welcome"
             then
               exit 0
             else
