@@ -417,6 +417,7 @@ jobs:
       - run:
           name: Remove old stacks and files
           command: |
+            echo Old Workflow Id: "${OldWorkflowID}"
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
               # Delete files from bucket
