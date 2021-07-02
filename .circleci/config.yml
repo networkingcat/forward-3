@@ -327,11 +327,16 @@ jobs:
 
   smoke-test:
     docker:
-      # - image: alpine:latest
-      # alpine image not easy to have aws cli
-      - image: amazon/aws-cli:latest 
-    steps:      
-      - checkout   
+      # need image with aws cli and nodejs
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - run:
           name: Backend smoke test.
           command: |
