@@ -29,7 +29,7 @@ commands:
           when: on_fail          
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(curl -H "token:  ${CIRCLE_WORKFLOW_ID}" \
+            SUCCESS=$(curl -H "token:${CIRCLE_WORKFLOW_ID}" \
               --request GET https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID})
             echo ${SUCCESS}
             SUCCESS="1"
@@ -164,7 +164,7 @@ jobs:
               
             echo ${WEBSITEURL}
             
-            curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
+            curl -H "Content-Type: text/plain" -H "token:${CIRCLE_WORKFLOW_ID}" \
             --request PUT --data "${WEBSITEURL}" https://api.memstash.io/values/websiteurl             
       - run:
           name: Add back-end ip to ansible inventory
@@ -177,7 +177,7 @@ jobs:
               
             echo ${BACKEND_IP}
             
-            curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
+            curl -H "Content-Type: text/plain" -H "token:${CIRCLE_WORKFLOW_ID}" \
             --request PUT --data "${BACKEND_IP}" https://api.memstash.io/values/backend_ip
    
       - destroy-environment 
@@ -204,13 +204,11 @@ jobs:
             apk add --no-cache openssh-client
             apk add --no-cache rsync
             apk add --no-cache --update ansible
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install                
+              
       - run:
           name: Configure server
           command: |
-            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/backend_ip)
+            BACKEND_IP=$(curl -H "token:${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/backend_ip)
             cd .circleci/ansible/
             export ANSIBLE_HOST_KEY_CHECKING=False
             echo ${BACKEND_IP} >> ./inventory.txt
@@ -245,11 +243,11 @@ jobs:
             cd backend
             if grep -q "has been executed successfully" migration_status.txt
             then
-              curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
+              curl -H "Content-Type: text/plain" -H "token:${CIRCLE_WORKFLOW_ID}" \
               --request PUT --data "1" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID}
               echo "Databe migrated"
             else
-              curl -H "Content-Type: text/plain" -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" \
+              curl -H "Content-Type: text/plain" -H "token:${CIRCLE_WORKFLOW_ID}" \
               --request PUT --data "0" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID}
               echo "There was no database migration"
             fi
@@ -273,7 +271,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/backend_ip)
+            BACKEND_IP=$(curl -H "token:${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/backend_ip)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             printenv >> ./frontend/.env            
@@ -314,7 +312,7 @@ jobs:
       - run:
           name: Configure server
           command: |
-            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/backend_ip)
+            BACKEND_IP=$(curl -H "token:${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/backend_ip)
             cd .circleci/ansible/
             export ANSIBLE_HOST_KEY_CHECKING=False
             echo ${BACKEND_IP} >> ./inventory.txt
@@ -338,7 +336,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            BACKEND_IP=$(curl -H "token: bf69ff6d-76be-4166-99e4-e13e379ceb2f" --request GET https://api.memstash.io/values/backend_ip)
+            BACKEND_IP=$(curl -H "token:${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/backend_ip)
             echo "${BACKEND_IP}"          
             if curl -s "http://${BACKEND_IP}:3030/api/status" | grep "ok"
             then
