@@ -413,13 +413,13 @@ jobs:
             #export OldWorkflowID="$OldWorkflowID"
             export OldWorkflowID="4e6755a5-3c79-4217-9a33-84363ded5a05"
             echo Old Workflow Id: "${OldWorkflowID}"
-            export STACKS=($(aws cloudformation list-stacks --region eu-central-1 --query "StackSummaries[*]|[?starts_with(StackName,'uda')].StackName" --stack-status-filter CREATE_COMPLETE)) 
+            # export STACKS=($(aws cloudformation list-stacks --region eu-central-1 --query "StackSummaries[*]|[?starts_with(StackName,'uda')].StackName" --stack-status-filter CREATE_COMPLETE)) 
+            CurrentWorkflowID=${CIRCLE_WORKFLOW_ID}
 
 
 
 
-
-            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+            if [[ "${CurrentWorkflowID}" != "${OldWorkflowID}" ]]
             then
               # Delete files from bucket
               aws s3 rm s3://udapeople-${OldWorkflowID}/ --recursive
