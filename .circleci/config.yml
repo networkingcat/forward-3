@@ -414,10 +414,11 @@ jobs:
             export OldWorkflowID="4e6755a5-3c79-4217-9a33-84363ded5a05"
             echo Old Workflow Id: "${OldWorkflowID}"
             export STACKS=($(aws cloudformation list-stacks --region eu-central-1 --query "StackSummaries[*]|[?starts_with(StackName,'uda')].StackName" --stack-status-filter CREATE_COMPLETE)) 
-      - run:
-          name: Remove old stacks and files
-          command: |
-            echo Old Workflow Id: "${OldWorkflowID}"
+
+
+
+
+
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
               # Delete files from bucket
