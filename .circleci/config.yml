@@ -388,6 +388,13 @@ jobs:
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
             curl -H "Content-Type: text/plain" -H "token:${CIRCLE_WORKFLOW_ID}" --request PUT --data "$WORKFLOWID" https://api.memstash.io/values/workflowid
+
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name udacity-cloudfront \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID}" \
+              --region eu-central-1
+      
       # Here's where you will add some code to rollback on failure  
       - destroy-environment 
       - revert-migrations   
@@ -413,11 +420,11 @@ jobs:
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
               # Delete files from bucket
-              #aws s3 rm s3://udapeople-${OldWorkflowID}/ --recursive
+              aws s3 rm s3://udapeople-${OldWorkflowID}/ --recursive
               # Delete front end stack
-              #aws cloudformation delete-stack --stack-name udacity-frontend-thomas-forward-${OldWorkflowID}
+              aws cloudformation delete-stack --stack-name udacity-frontend-thomas-forward-${OldWorkflowID}
               ## Delete back end stack
-              #aws cloudformation delete-stack --stack-name udacity-backend-thomas-forward-${OldWorkflowID}
+              aws cloudformation delete-stack --stack-name udacity-backend-thomas-forward-${OldWorkflowID}
             fi
             
 
