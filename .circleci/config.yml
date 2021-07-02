@@ -328,7 +328,7 @@ jobs:
   smoke-test:
     docker:
       # need image with aws cli and nodejs
-      - image: circleci/node:13.8.0
+      - image: alpine:latest
     steps:
       - checkout
       - run:
