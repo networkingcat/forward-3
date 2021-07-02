@@ -328,14 +328,16 @@ jobs:
   smoke-test:
     docker:
       # need image with aws cli and nodejs
-      - image: alpine:latest
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: |
             apk add --no-cache curl
-
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - run:
           name: Backend smoke test.
           command: |
@@ -344,19 +346,19 @@ jobs:
             if curl -s "http://${BACKEND_IP}:3030/api/status" | grep "ok"
             then
               echo "http://${BACKEND_IP}:3030/api/status"
-              return 0
+              exit 0
             else
               echo "http://${BACKEND_IP}:3030/api/status"
-              return 1
+              exit 1
             fi
       - run:
           name: Frontend smoke test.
           command: |
-            if curl -s "http://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4.s3-website.eu-central-1.amazonaws.com/fail_please" | grep -o "Welcome"
+            if curl -s "http://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4.s3-website.eu-central-1.amazonaws.com/" | grep -o "Welcome"
             then
-              return 0
+              exit 0
             else
-              return 1
+              exit 1
             fi
       - destroy-environment 
       - revert-migrations      
