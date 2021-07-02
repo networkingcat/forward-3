@@ -293,7 +293,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            aws s3 cp dist/ s3://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4 --recursive
+            aws s3 cp dist/ s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
       #aws s3 cp dist/ s3://udapeople-"${CIRCLE_WORKFLOW_ID}"  --recursive
       - destroy-environment
       - revert-migrations      
@@ -358,7 +358,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            if curl -s "http://udapeople-a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4.s3-website.eu-central-1.amazonaws.com/" | grep -o "Welcome"
+            if curl -s "http://udapeople-${CIRCLE_WORKFLOW_ID}.s3-website.eu-central-1.amazonaws.com/" | grep -o "Welcome"
             then
               exit 0
             else
@@ -410,8 +410,8 @@ jobs:
           command: |
 
             OldWorkflowID=$(curl -H "token:${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/workflowid)
-            #export OldWorkflowID="$OldWorkflowID"
-            export OldWorkflowID="a4583fb5-c06e-4a23-a4c6-2c3e5ef905e4"
+            export OldWorkflowID="$OldWorkflowID"
+           
             echo Old Workflow Id: "${OldWorkflowID}"
             # export STACKS=($(aws cloudformation list-stacks --region eu-central-1 --query "StackSummaries[*]|[?starts_with(StackName,'uda')].StackName" --stack-status-filter CREATE_COMPLETE)) 
             CurrentWorkflowID=${CIRCLE_WORKFLOW_ID}
